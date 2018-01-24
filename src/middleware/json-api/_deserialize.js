@@ -1,22 +1,24 @@
 const _ = require('lodash')
 const pluralize = require('pluralize')
 
-const cache = new class {
-  constructor() { this._cache = []; }
-
-  set(type, id, deserializedData) {
-    this._cache.push({
-      type: type,
-      id: id,
-      deserialized: deserializedData
-    });
+const cache = (function(cache = []) {
+  return {
+    clear: () => {
+      cache = []
+    },
+    set : (type, id, deserializedData) => {
+      cache.push({
+        type: type,
+        id: id,
+        deserialized: deserializedData
+      });
+    },
+    get: (type, id) => {
+      const match = _.find(cache, r => r.type === type && r.id === id);
+      return match && match.deserialized;
+    }
   }
-
-  get(type, id) {
-    const match = _.find(this._cache, r => r.type === type && r.id === id);
-    return match && match.deserialized;
-  }
-}
+})();
 
 function collection (items, included, responseModel, useCache = false) {
   return items.map(item => {
@@ -151,5 +153,7 @@ function isRelatedItemFor (attribute, relatedItem, relationMapItem) {
 
 module.exports = {
   resource: resource,
-  collection: collection
+  collection: collection,
+  cache: cache
 }
+
