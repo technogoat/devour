@@ -26,6 +26,7 @@ module.exports = {
     let deserializedResponse = null
 
     if (status !== 204 && needsDeserialization(req.method)) {
+      deserialize.cache.clear();
       if (isCollection(res.data)) {
         deserializedResponse = deserialize.collection.call(jsonApi, res.data, included, req.model)
       } else if (res.data) {
@@ -45,3 +46,4 @@ module.exports = {
     return deserializedResponse
   }
 }
+
